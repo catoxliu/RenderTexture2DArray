@@ -1,0 +1,10 @@
+RenderTexture2DArray/Library/
+Android/obj/
+Android/bin/
+Android/libs/armeabi-v7a
+Android/libs/arm64-v8a
+*.apk
+*.sln
+*.csproj
+*.suo
+Android/gen/

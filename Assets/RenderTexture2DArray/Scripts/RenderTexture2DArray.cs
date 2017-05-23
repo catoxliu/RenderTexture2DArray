@@ -100,16 +100,16 @@ namespace RT2DARRAY
             Matrix4x4 camera2World = mainCam.cameraToWorldMatrix;
             Matrix4x4 c2w_L, c2w_R, w2c_L, w2c_R;
 
-            Matrix4x4 eyeOffsetMat = Matrix4x4.TRS(eyeOffsetVector, Quaternion.identity, Vector3.one);
-            w2c_L = world2Camera * eyeOffsetMat;
-            w2c_R = world2Camera * eyeOffsetMat.inverse;
+            Matrix4x4 eyeOffsetMatrix = Matrix4x4.TRS(eyeOffsetVector, Quaternion.identity, Vector3.one);
+            w2c_L = world2Camera * eyeOffsetMatrix;
+            w2c_R = world2Camera * eyeOffsetMatrix.inverse;
 
             unity_StereoWorldToCamera[0] = w2c_L;
             unity_StereoWorldToCamera[1] = w2c_R;
             Shader.SetGlobalMatrixArray("unity_StereoWorldToCamera", unity_StereoWorldToCamera);
 
-            c2w_L = camera2World * eyeOffsetMat;
-            c2w_R = camera2World * eyeOffsetMat.inverse;
+            c2w_L = camera2World * eyeOffsetMatrix;
+            c2w_R = camera2World * eyeOffsetMatrix.inverse;
             unity_StereoCameraToWorld[0] = c2w_L;
             unity_StereoCameraToWorld[1] = c2w_R;
             Shader.SetGlobalMatrixArray("unity_StereoCameraToWorld", unity_StereoCameraToWorld);
@@ -127,6 +127,24 @@ namespace RT2DARRAY
             unity_StereoMatrixVP[0] = unity_StereoMatrixP[0] * w2c_L;
             unity_StereoMatrixVP[1] = unity_StereoMatrixP[1] * w2c_R;
             Shader.SetGlobalMatrixArray("unity_StereoMatrixVP", unity_StereoMatrixVP);
+
+            CommandBuffer afterSkyCB = new CommandBuffer();
+            mainCam.RemoveCommandBuffers(CameraEvent.AfterSkybox);
+            afterSkyCB.SetGlobalMatrixArray("unity_StereoMatrixVP", unity_StereoMatrixVP);
+            mainCam.AddCommandBuffer(CameraEvent.AfterSkybox, afterSkyCB);
+
+            Matrix4x4 viewMatrix1 = Matrix4x4.LookAt(Vector3.zero, mainCam.transform.forward, mainCam.transform.up) * Matrix4x4.Scale(new Vector3(1, 1, -1));
+            viewMatrix1 = viewMatrix1.transpose;
+            Matrix4x4 proj = unity_StereoMatrixP[0];
+            proj.m22 = -1.0f;
+            Matrix4x4[] skybox_MatrixVP = new Matrix4x4[2];
+            skybox_MatrixVP[0] = proj * viewMatrix1;
+            skybox_MatrixVP[1] = proj * viewMatrix1;
+
+            CommandBuffer beforeSkyCB = new CommandBuffer();
+            mainCam.RemoveCommandBuffers(CameraEvent.BeforeSkybox);
+            beforeSkyCB.SetGlobalMatrixArray("unity_StereoMatrixVP", skybox_MatrixVP);
+            mainCam.AddCommandBuffer(CameraEvent.BeforeSkybox, beforeSkyCB);
         }
     }
 
