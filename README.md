@@ -18,4 +18,4 @@ Using Unity5.6(above) single-pass stereo rendering on Android (supported Multi-V
 * Firstly, this Unity feature is a preview one, which means it's buggy and not stable.
 * Secondly, this solution is a tricky way, I use native plugin to change Unity framebuffer to bind with my Texture2DArray and enable Unity's shader keywords "STEREO_MULTIVIEW_ON" to let it do the magic. So you may get wrong or nothing if you are not using the proper shader.
 * Last, I calculate matrix for two eyes and set them for shaders in **OnPreRender** step, so if you want do magic about view projection matrix, you should probably do it here.
-* **The biggest problem now is that I CANNOT render the SKYBOX properly!** I am still working on this and if anyone has any thoughts about it, will be glad to hear that.
+* **The latest update [84b00bd] fixed skybox rendering**, so far it seems to be OK.
