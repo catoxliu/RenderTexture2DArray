@@ -11,6 +11,7 @@ static IUnityGraphics* s_Graphics = NULL;
 static UnityGfxRenderer s_RendererType = kUnityGfxRendererNull;
 static GLuint frameBufferTextureId = 0;
 static GLuint frameBufferDepthTextureId = 0;
+static GLint antiAliasing = 0;
 
 // Unity plugin load event
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -45,6 +46,13 @@ static void UNITY_INTERFACE_API
             if (!glFramebufferTextureMultiviewOVR)
             {
             	ANDROID_LOG("Can not get proc address for glFramebufferTextureMultiviewOVR.\n");
+            	//exit(EXIT_FAILURE);
+            }
+            
+            glFramebufferTextureMultisampleMultiviewOVR = (PFNGLFRAMEBUFFERTEXTUREMULTISAMPLEMULTIVIEWOVR)eglGetProcAddress ("glFramebufferTextureMultisampleMultiviewOVR");
+            if (!glFramebufferTextureMultisampleMultiviewOVR)
+            {
+            	ANDROID_LOG("Can not get proc address for glFramebufferTextureMultisampleMultiviewOVR.\n");
             	//exit(EXIT_FAILURE);
             }
 
@@ -108,14 +116,22 @@ static void HackFrambuffer()
 	GL_CHECK(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
 //	CheckFramebufferStatus();
 
-//	GL_CHECK(glBindTexture(GL_TEXTURE_2D_ARRAY, frameBufferTextureId));
-	GL_CHECK(glFramebufferTextureMultiviewOVR(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, frameBufferTextureId, 0, 0, 2));
-//	CheckFramebufferStatus();
+    if (antiAliasing > 1)
+    {
+        GL_CHECK(glFramebufferTextureMultisampleMultiviewOVR(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, frameBufferTextureId, 0, antiAliasing, 0, 2));
+        //	CheckFramebufferStatus();
+        GL_CHECK(glFramebufferTextureMultisampleMultiviewOVR(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, frameBufferDepthTextureId, 0, antiAliasing, 0, 2));
+        //	CheckFramebufferStatus();
+    }
+    else
+    {
+        GL_CHECK(glFramebufferTextureMultiviewOVR(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, frameBufferTextureId, 0, 0, 2));
+        //	CheckFramebufferStatus();
 
-//	GL_CHECK(glBindTexture(GL_TEXTURE_2D_ARRAY, frameBufferDepthTextureId));
-	GL_CHECK(glFramebufferTextureMultiviewOVR(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, frameBufferDepthTextureId, 0, 0, 2));
-	CheckFramebufferStatus();
-
+        GL_CHECK(glFramebufferTextureMultiviewOVR(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, frameBufferDepthTextureId, 0, 0, 2));
+        CheckFramebufferStatus();
+    }
+	
 	//Use Unity commandbuffer to clear
 	//GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
@@ -278,4 +294,10 @@ extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
     GetTextureIDFunc()
 {
     return OnTextureID;
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+    SetAntiAliasingLevel(int level)
+{
+    antiAliasing = level;
 }

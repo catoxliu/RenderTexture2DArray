@@ -8,3 +8,11 @@ Android/libs/arm64-v8a
 *.csproj
 *.suo
 Android/gen/
+Android/res/
+Android/.classpath
+Android/.cproject
+Android/.project
+Android/AndroidManifest.xml
+Android/proguard-project.txt
+Android/project.properties
+Android/.settings/org.eclipse.jdt.core.prefs

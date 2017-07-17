@@ -45,6 +45,7 @@ namespace RT2DARRAY
             Debug.Log("Texture ID " + (int)tid);
 			//Tell native plugin the texture id
             NativePlugin.SetTextureID((int)tid);
+            NativePlugin.SetAntiAliasing(QualitySettings.antiAliasing);
         }
 
 

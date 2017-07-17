@@ -13,6 +13,8 @@ namespace RT2DARRAY
         private static extern IntPtr GetRenderEventFunc();
         [DllImport(libCameraCallbacks)]
         private static extern IntPtr GetTextureIDFunc();
+        [DllImport(libCameraCallbacks)]
+        private static extern void SetAntiAliasingLevel(int level);
 
         public static void AddCameraCallbacks(Camera cam, CameraEvent camEvent)
         {
@@ -27,6 +29,13 @@ namespace RT2DARRAY
         {
 #if !UNITY_EDITOR
         GL.IssuePluginEvent(GetTextureIDFunc(), id);
+#endif
+        }
+        
+        public static void SetAntiAliasing(int level)
+        {
+#if !UNITY_EDITOR
+            SetAntiAliasingLevel(level);
 #endif
         }
 

@@ -72,6 +72,8 @@ void CheckOpenGLError(const char* stmt, const char* fname, int line)
 
 typedef void (*PFNGLFRAMEBUFFERTEXTUREMULTIVIEWOVR) (GLenum, GLenum, GLuint, GLint, GLint, GLsizei);
 PFNGLFRAMEBUFFERTEXTUREMULTIVIEWOVR glFramebufferTextureMultiviewOVR;
+typedef void (*PFNGLFRAMEBUFFERTEXTUREMULTISAMPLEMULTIVIEWOVR) (GLenum, GLenum, GLuint, GLint, GLsizei, GLint, GLsizei);
+PFNGLFRAMEBUFFERTEXTUREMULTISAMPLEMULTIVIEWOVR glFramebufferTextureMultisampleMultiviewOVR;
 
 
 #ifdef _DEBUG
